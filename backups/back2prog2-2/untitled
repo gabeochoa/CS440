@@ -1,0 +1,835 @@
+#ifndef CS540_MAP
+#define CS540_MAP
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+#define COMPACT
+#define COLOR_RESET   "\x1b[0m"
+#define COLOR_GREEN   COLOR_RESET//"\x1b[32m"
+#define COLOR_RED     "\x1b[31m"
+
+using std::string;
+namespace cs540
+{
+    template < typename Key_T, typename Mapped_T> 
+    class Map;
+
+    template < typename Key_T, typename Mapped_T> 
+    struct Iterator;
+    template < typename Key_T, typename Mapped_T> 
+    struct ConstIterator;
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b);
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b);
+
+    template < typename Key_T, typename Mapped_T> class Map
+    { 
+        //Forward Decl;
+        template <std::pair<Key_T,Mapped_T> > 
+        class Node;
+
+    public:
+            template < Key_T, Mapped_T> 
+            struct Iterator
+            {
+                Node<std::pair<Key_T,Mapped_T>  * data;
+                Iterator(): data(nullptr){}
+                Iterator(Node<std::pair<Key_T, Mapped_T> >* _dt): data(_dt){}
+                Iterator(const Iterator & it)
+                {
+                    data = it.data;
+                }
+                ~Iterator()
+                {
+
+                }
+                Iterator& operator=(const Iterator & it)
+                {
+                    data = it.data;
+                }
+                Iterator &operator++()
+                {
+                    Iterator rt = *this;
+                    if(data != nullptr)
+                        data = data->right;
+                    return Iterator(rt);
+                }
+                Iterator operator++(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->right;
+                    return *this;
+                }
+                Iterator &operator--()
+                {
+                    Iterator rt = *this;
+                    if(data != nullptr)
+                        data = data->left;
+                    return Iterator(rt);
+                }
+                Iterator operator--(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->left;
+                    return *this;
+                }
+                std::pair<Key_T, Mapped_T>  &operator*() const
+                {
+                    return data->val;
+                }
+                std::pair<Key_T, Mapped_T>  *operator->() const
+                {
+                    return &(data->val);
+                }
+            };
+            template < Key_T, Mapped_T> 
+            struct ConstIterator
+            {
+                Node<std::pair<Key_T, Mapped_T> >* data;
+                ConstIterator(): data(nullptr){}
+                ConstIterator(Node<std::pair<Key_T, Mapped_T> >* _dt): data(_dt){}
+                ConstIterator(const ConstIterator & it)
+                {
+                    data = it.data;
+                }
+                ~ConstIterator()
+                {
+
+                }
+                ConstIterator& operator=(const ConstIterator & it)
+                {
+                    data = it.data;
+                }
+                ConstIterator &operator++()
+                {
+                    ConstIterator rt = *this;
+                    if(data != nullptr)
+                        data = data->right;
+                    return ConstIterator(rt);
+                }
+                ConstIterator operator++(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->right;
+                    return *this;
+                }
+                ConstIterator &operator--()
+                {
+                    ConstIterator rt = *this;
+                    if(data != nullptr)
+                        data = data->left;
+                    return ConstIterator(rt);
+                }
+                ConstIterator operator--(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->left;
+                    return *this;
+                }
+                std::pair<Key_T, Mapped_T>  &operator*() const
+                {
+                    return data->val;
+                }
+                std::pair<Key_T, Mapped_T>  *operator->() const
+                {
+                    return &(data->val);
+                }
+            };
+            template < Key_T, Mapped_T> 
+            struct ReverseIterator
+            {                
+                Node<std::pair<Key_T, Mapped_T> >* data;
+                ReverseIterator(): data(nullptr){}
+                ReverseIterator(Node<std::pair<Key_T, Mapped_T> >* _dt): data(_dt){}
+                ReverseIterator(const ReverseIterator & it)
+                {
+                    data = it.data;
+                }
+                ~ReverseIterator()
+                {
+
+                }
+                ReverseIterator& operator=(const ReverseIterator & it)
+                {
+                    data = it.data;
+                }
+                ReverseIterator &operator--()
+                {
+                    ReverseIterator rt = *this;
+                    if(data != nullptr)
+                        data = data->right;
+                    return ReverseIterator(rt);
+                }
+                ReverseIterator operator--(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->right;
+                    return *this;
+                }
+                ReverseIterator &operator++()
+                {
+                    ReverseIterator rt = *this;
+                    if(data != nullptr)
+                        data = data->left;
+                    return ReverseIterator(rt);
+                }
+                ReverseIterator operator++(int dummy)
+                {
+                    if(data != nullptr)
+                        data = data->left;
+                    return *this;
+                }
+                std::pair<Key_T, Mapped_T>  &operator*() const
+                {
+                    return data->val;
+                }
+                std::pair<Key_T, Mapped_T>  *operator->() const
+                {
+                    return &(data->val);
+                }
+            };
+
+        private:
+            template < std::pair< Key_T, Mapped_T> > struct Node
+            {
+                std::pair<Key_T, Mapped_T>  val;
+                Node<std::pair<Key_T, Mapped_T> > *left, *right;
+                bool parCol;     // color of parent link, black=true
+                int numChildren; 
+                int parDir = 0;
+
+                Node(): val(NULL), left(nullptr), right(nullptr), parCol(true), numChildren(0), parDir(0){}
+                Node(std::pair<Key_T, Mapped_T>  v, bool col, int nc, int par): 
+                val(v), left(nullptr), right(nullptr),
+                parCol(col), numChildren(nc), parDir(par) {} 
+                
+                ~Node()
+                {
+                    if(left != nullptr)
+                        delete left;
+                    if(right != nullptr)
+                        delete right;
+                }
+
+            };
+
+            template < Key_T, Mapped_T> class LinkedList
+            {
+                //This is a tree where we only use the right child
+                private:
+                    Node<std::pair<Key_T, Mapped_T> >* _root;
+                    Node<std::pair<Key_T, Mapped_T> >* _end;
+                    int s_ze;
+                public:
+                    LinkedList(): _root(nullptr), _end(nullptr), s_ze(0)
+                    {
+
+                    }
+                    int size()
+                    {
+                        return s_ze;
+                    }
+                    void add(Node<std::pair<Key_T, Mapped_T> >& nn)
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* n = new Node<std::pair<Key_T, Mapped_T> >(nn.val, false, 1, nn.parDir);
+                        
+                        if(_root == nullptr)
+                        {
+                            _root = n;
+                            _end = n;
+                        }
+                        else
+                        {
+                            Node<std::pair<Key_T, Mapped_T> >* t = _end;
+                            t->right = n;
+                            n->left = t;
+                            n->right = nullptr;
+                            _end = n;
+                        }
+                        s_ze++;
+                    }
+                    void remove(Node<std::pair<Key_T, Mapped_T> >* n)
+                    {
+                        bool found = false;
+                        Node<std::pair<Key_T, Mapped_T> >* cur = _root;
+                        Node<std::pair<Key_T, Mapped_T> >* del;
+                        while(cur != nullptr)
+                        {
+                            if(cur->val == n->val)
+                            {
+                                found = true;
+                                del = (cur->left)->right;
+                                (cur->left)->right = cur->right;
+                                delete del;
+                            }
+                        }
+                        if(found)
+                            s_ze--;
+                    }
+                    void t_print()
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* cur = _root;
+                        while(cur != nullptr)
+                        {
+                            std::cout << cur->val.first;
+                            cur = cur->right;
+                            if(cur != nullptr)
+                                std::cout << ", ";
+                        }
+                        std::cout << std::endl;
+                    }
+
+            };
+
+            template < Key_T, Mapped_T> 
+            class RBT
+            {
+                private:
+                    int chil(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r == nullptr)
+                            return 0;
+                        return r->numChildren;
+                    }
+
+                    bool isblk(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r == nullptr)
+                            return true;
+                        return r->parCol;
+                    }
+                    //to handle checking left child of r
+                    bool isblkL(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r == nullptr)
+                            return true;
+                        if(r->left == nullptr)
+                            return true;
+                        return r->left->parCol;
+                    }
+
+                    void flipColor(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r == nullptr)
+                            return;
+                        else
+                            r->parCol = !r->parCol;
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* rotateRight(Node<std::pair<Key_T, Mapped_T> >* r) 
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* x = r->left;
+                        if(x == nullptr)
+                        {
+                            return r;
+                        }
+                        r->left = x->right;
+                        x->right = r;
+                        x->parCol = x->right->parCol;
+                        x->right->parCol = false;
+                        x->numChildren = r->numChildren;
+                        r->numChildren = chil(r->left) + chil(r->right) + 1;
+                        return x;
+                    }
+              
+                    Node<std::pair<Key_T, Mapped_T> >* rotateLeft(Node<std::pair<Key_T, Mapped_T> >* r) 
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* x = r->right;
+                        if(x == nullptr)
+                        {
+                            return r;
+                        }
+                        r->right = x->left;
+                        x->left = r;
+                        x->parCol = x->left->parCol;
+                        x->left->parCol = false;
+                        x->numChildren = r->numChildren;
+                        r->numChildren = chil(r->left) + chil(r->right) + 1;
+                        return x;
+                    }
+
+                    void flip(Node<std::pair<Key_T, Mapped_T> >* r) {
+                        flipColor(r);
+                        flipColor(r->left);
+                        flipColor(r->right);
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* aux_addNode(Node<std::pair<Key_T, Mapped_T> >* r, const std::pair<Key_T, Mapped_T>  val, int dir) 
+                    { 
+                        if(r == nullptr)
+                        {
+                            Node<std::pair<Key_T, Mapped_T> >* nnode = new Node<std::pair<Key_T, Mapped_T> >(val, false, 1, dir);
+                            lldata.add(*nnode);
+                            return nnode;
+                        }
+                        if(val.first < r->val.first)
+                        {
+                            Node<std::pair<Key_T, Mapped_T> >* next= aux_addNode(r->left, val, -1);
+                            r->left = next;
+                        }
+                        else if(val.first > r->val.first)
+                        {
+                            Node<std::pair<Key_T, Mapped_T> >* next= aux_addNode(r->right, val, 1);
+                            r->right = next;
+                        }
+                        else
+                        {   //equals
+                            r->val = val;
+                        }
+                        
+                        if( (!isblk(r->right)) && (isblk(r->left)) )
+                        {
+                            r = rotateLeft(r);
+                        }
+                        if( (!isblk(r->left)) && (!isblkL(r->left)) )
+                        {
+                            r = rotateRight(r);
+                        }
+                        if( (!isblk(r->left)) && (!isblk(r->right)) )
+                        {
+                            flip(r);
+                        }
+                        
+                        r->numChildren = chil(r->left) + chil(r->right) + 1;
+                        return r;
+                    }
+
+                public:
+
+                    LinkedList<std::pair<Key_T, Mapped_T> > lldata;
+                    Node<std::pair<Key_T, Mapped_T> >* root;
+
+                    RBT(): root(nullptr){}
+                    RBT(Node<std::pair<Key_T, Mapped_T> >* r): root(r){}
+                    ~RBT()
+                    {
+                        if(root != nullptr)
+                        {
+                            delete root;
+                        }
+                    }
+
+                    int size()
+                    {
+                        return lldata.size();
+                    }
+
+                    void addNode(const std::pair<Key_T, Mapped_T>  v)
+                    {
+                        root = aux_addNode(root, v, 0);
+                        root->parCol = true;
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* rebal(Node<std::pair<Key_T, Mapped_T> >* r) 
+                    {
+                        if(!isblk(r->right))
+                        {
+                            r = rotateLeft(r);
+                        }
+                        if( (!isblk(r->left)) && (!isblkL(r->left)) )
+                        {
+                            r = rotateRight(r);
+                        }
+                        if( (!isblk(r->left)) && (!isblk(r->right)) )
+                        {
+                            flip(r);
+                        }
+                        
+                        r->numChildren = chil(r->left) + chil(r->right) + 1;
+                        return r;
+                    }
+
+                    
+                    Node<std::pair<Key_T, Mapped_T> >* mrl(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        flip(r);
+                        if (!isblkL(r->right)) 
+                        { 
+                            r->right = rotateRight(r->right);
+                            r = rotateLeft(r);
+                            flip(r);
+                        }
+                        return r;
+                    }
+                    Node<std::pair<Key_T, Mapped_T> >* mrr(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        flip(r);
+                        if (!isblkL(r->left)) 
+                        { 
+                            r = rotateRight(r);
+                            flip(r);
+                        }
+                        return r;
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* r_min(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r->left == nullptr)
+                        {
+                            return nullptr;
+                        }
+                        if(isblk(r->left) && isblkL(r->left))
+                        {
+                            r = mrl(r);
+                        }
+                        r->left = r_min(r->left);
+                        return rebal(r);
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* g_min(Node<std::pair<Key_T, Mapped_T> >* r)
+                    {
+                        if(r->left == nullptr)
+                            return r;
+                        return r_min(r->left);
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* aux_remove(Node<std::pair<Key_T, Mapped_T> >* r, std::pair<Key_T, Mapped_T>  v)
+                    {
+
+                        if (v.first < r->val.first) 
+                        {
+                            if (isblk(r->left) && isblkL(r->left))
+                            {
+                                r = mrl(r);
+                            }
+                            r->left = aux_remove(r->left, v);
+                        }
+                        else {
+                            if (!isblk(r->left))
+                            {
+                                r = rotateRight(r);
+                            }
+                            if (v.first == r->val.first && r->right == nullptr)
+                            {
+                                return nullptr;
+                            }
+                            if (isblk(r->right) && isblkL(r->right))
+                            {
+                                r = mrr(r);
+                            }
+                            if (v.first == r->val.first)
+                            {
+                                Node<std::pair<Key_T, Mapped_T> >* tmp = g_min(r->right);
+                                r->val = tmp->val;
+                                r->right = r_min(r->right);
+                            }
+                            else
+                            {
+                                r->right = aux_remove(r->right, v);
+                            }
+                        }
+                        return rebal(r);
+                    }
+
+                    void removeNode(const std::pair<Key_T, Mapped_T>  v)
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* cur = find_node(v);
+                        if(cur == nullptr)
+                            return;
+                        lldata.remove(cur);
+
+                        if(isblk(root->left) && isblk(root->right))
+                        {
+                            root->parCol = false;
+                        }
+
+                        root = aux_remove(root, v);
+                        if (root == nullptr) 
+                            root->parCol = true;
+                    }
+
+                    void removeNode(const Iterator<std::pair<Key_T, Mapped_T> > v)
+                    {
+
+                    }
+
+                    const std::pair<Key_T, Mapped_T> & find(std::pair<Key_T, Mapped_T>  v)
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* cur = root;
+                        while(cur != nullptr)
+                        {
+                            if(cur->val.first == v.first)
+                            {
+                                return cur->val;
+                            }
+                        }
+                        return v;
+                    }
+
+                    Node<std::pair<Key_T, Mapped_T> >* find_node(std::pair<Key_T, Mapped_T>  v)
+                    {
+                        Node<std::pair<Key_T, Mapped_T> >* cur = root;
+                        while(cur != nullptr)
+                        {
+                            if(cur->val.first == v.first)
+                            {
+                                return cur;
+                            }
+                        }
+                        return nullptr;
+                    }
+
+                    int _print_t(Node<std::pair<Key_T, Mapped_T> > *tree, int is_left, int offset, int depth, char s[200][255])
+                    {
+                        char b[200];
+                        int width = 7;
+
+                        if (!tree) return 0;
+
+                        if(!isblk(tree))
+                        {
+                            sprintf(b, "%s(%d->%d)%s", "", tree->val.first, tree->val.second, "");
+                        }
+                        else
+                        {
+                            sprintf(b, "%s(%d->%d)%s", "", tree->val.first, tree->val.second, "");
+                        }
+                        int left  = _print_t(tree->left,  1, offset,                depth + 1, s);
+                        int right = _print_t(tree->right, 0, offset + left + width, depth + 1, s);
+
+                        #ifdef COMPACT
+                            for (int i = 0; i < width; i++)
+                                s[depth][offset + left + i] = b[i];
+
+                            if (depth && is_left) {
+
+                                for (int i = 0; i < width + right; i++)
+                                    s[depth - 1][offset + left + width/2 + i] = '-';
+
+                                s[depth - 1][offset + left + width/2] = '.';
+
+                            } else if (depth && !is_left) {
+
+                                for (int i = 0; i < left + width; i++)
+                                    s[depth - 1][offset - width/2 + i] = '-';
+
+                                s[depth - 1][offset + left + width/2] = '.';
+                            }
+                        #else
+                            for (int i = 0; i < width; i++)
+                                s[2 * depth][offset + left + i] = b[i];
+
+                            if (depth && is_left) {
+
+                                for (int i = 0; i < width + right; i++)
+                                    s[2 * depth - 1][offset + left + width/2 + i] = '-';
+
+                                s[2 * depth - 1][offset + left + width/2] = '+';
+                                s[2 * depth - 1][offset + left + width + right + width/2] = '+';
+
+                            } else if (depth && !is_left) {
+
+                                for (int i = 0; i < left + width; i++)
+                                    s[2 * depth - 1][offset - width/2 + i] = '-';
+
+                                s[2 * depth - 1][offset + left + width/2] = '+';
+                                s[2 * depth - 1][offset - width/2 - 1] = '+';
+                            }
+                        #endif
+
+                        return left + width + right;
+                    }
+
+                    int print_t(Node<std::pair<Key_T, Mapped_T> > *tree)
+                    {
+                        char s[200][255];
+                        for (int i = 0; i < chil(tree); i++)
+                            sprintf(s[i], "%80s", " ");
+
+                        _print_t(tree, 0, 0, 0, s);
+
+                        for (int i = 0; i < chil(tree); i++)
+                            printf("%s\n", s[i]);
+                    }
+
+                    void print_list()
+                    { 
+                        lldata.t_print();
+                    }
+            };
+            RBT<std::pair<Key_T, Mapped_T> > data;
+
+        public:
+            Map(){}
+            Map(const Map &){}
+            Map &operator=(const Map & m)
+            {
+                if(m != *this)
+                {
+                    this->data = m.data;
+                }
+                return *this;
+            }
+            Map(std::initializer_list<std::pair<Key_T, Mapped_T> > lis)
+            {
+                for(auto iter = lis.begin(); iter != lis.end(); iter++)
+                {
+                    data.addNode(*iter);
+                }
+            }
+            ~Map(){}
+
+            size_t size() const
+            {
+                if(empty())
+                    return 0;
+                else
+                    return data.root->numChildren+1;
+            }
+            bool empty() const
+            {
+                return data.root == nullptr;
+            }
+
+            cs540::Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T>> begin()
+            {
+                return Iterator<std::pair<Key_T, Mapped_T> >(data.root);
+            }
+            cs540::Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T>> end()
+            {
+                return Iterator<std::pair<Key_T, Mapped_T> >();
+            }
+
+            ConstIterator begin() const{return ConstIterator<std::pair<Key_T, Mapped_T> >(data.root);}
+            ConstIterator end() const{return ConstIterator<std::pair<Key_T, Mapped_T> >();}
+            
+            ReverseIterator rbegin()
+            {return ReverseIterator<std::pair<Key_T, Mapped_T> >(data.lldata._end);}
+
+            ReverseIterator rend(){return ReverseIterator<std::pair<Key_T, Mapped_T> >();}
+            
+            Iterator find(const Key_T &){return Iterator<std::pair<Key_T, Mapped_T> >();}
+            ConstIterator find(const Key_T &) const{return ConstIterator<std::pair<Key_T, Mapped_T> >();}
+            Mapped_T &at(const Key_T &)
+            {return data.root->val.second;}
+            const Mapped_T &at(const Key_T & kee) const
+            {
+                return data.find(std::make_pair(kee, Mapped_T()));
+            }
+            Mapped_T &operator[](const Key_T &)
+            {return data.root->val.second;} 
+
+            std::pair<Iterator<std::pair<Key_T, Mapped_T> >, bool> 
+            insert(std::initializer_list<Key_T> const& lis)
+            {
+                if(lis.size() != 2)
+                {
+                    //throw err
+                }
+                else
+                {
+                    data.addNode(std::make_pair(*(lis.begin()), *(lis.begin()+1)));
+                }
+                std::pair<Iterator<std::pair<Key_T, Mapped_T> >, bool> ret = make_pair(begin(), false);
+                return ret;
+            }
+            
+            template <typename IT_T>
+            void insert(IT_T range_beg, IT_T range_end)
+            {
+
+            }
+
+            void erase(Iterator<std::pair<Key_T, Mapped_T> > pos)
+            {
+
+            }
+            void erase(const Key_T & kee)
+            {
+                data.removeNode(std::make_pair(kee, Mapped_T()));
+            }
+            void clear()
+            {
+                while(data.size() != 0)
+                {
+                    erase(begin());
+                }
+            }
+
+            void print()
+            {
+                data.print_t(data.root);
+                data.print_list();
+            }
+            
+    };
+ 
+    template < typename Key_T, typename Mapped_T>  
+    bool static operator==(const Map< Key_T, Mapped_T>  & a, const Map< Key_T, Mapped_T>  & b)
+    {return false;}
+    template < typename Key_T, typename Mapped_T>  
+    bool static operator!=(const Map< Key_T, Mapped_T>  & a, const Map< Key_T, Mapped_T>  & b)
+    {return false;}
+    template < typename Key_T, typename Mapped_T>  
+    bool static operator<(const Map< Key_T, Mapped_T>  & a, const Map< Key_T, Mapped_T>  & b)
+    {return false;}
+
+
+
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T> > & a, const typename Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T> > & b)
+    {
+        if(a.data == b.data)
+        {
+            return (*a) == (*b);
+        }
+        return false;
+    }
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b)
+    {
+        if(a.data == b.data)
+        {
+            return (*a) == (*b);
+        }
+        return false;
+    }
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b)
+    {
+        if(a.data == b.data)
+        {
+            return (*a) == (*b);
+        }
+        return false;
+    }
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator==(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b)
+    {
+        if(a.data == b.data)
+        {
+            return (*a) == (*b);
+        }
+        return false;
+    }
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T> > & a, const typename Map<Key_T, Mapped_T>:: template Iterator<std::pair<Key_T, Mapped_T> > & b)
+    {return !(a==b);}
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b)
+    {return !(a==b);}
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::Iterator & a, const typename Map<Key_T, Mapped_T>::ConstIterator & b)
+    {return !(a==b);}
+    template < typename Key_T, typename Mapped_T>  
+    static bool operator!=(const typename Map<Key_T, Mapped_T>::ConstIterator & a, const typename Map<Key_T, Mapped_T>::Iterator & b)
+    {return !(a==b);}
+    
+}
+
+#endif
